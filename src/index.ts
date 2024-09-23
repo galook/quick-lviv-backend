@@ -37,12 +37,18 @@ app.get('/webhoookAPI008ax', async (req: Request, res: Response) => {
     
 });
 app.post('/subscribe', (req: Request, res: Response) => {
+    console.log("Subscribing: ", req.body);
     if(req.body.id) {
         if(!subscribers.includes(req.body.id)) {
             subscribers.push(req.body.id)
             console.log("New subscriber: ", req.body.id);
         }
+        console.log("No subscriber added");
+        
     }
+    console.log("Bad request");
+    res.send("A")
+    
 })
 
 app.listen(port, () => {
