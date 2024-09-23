@@ -17,15 +17,6 @@ const subscribers: string[] = [];
 // json parser 
 app.use(express.json());
 
-fapp.messaging().send({
-    data: {
-        text: "Hello from the server",
-        title: "Hello from the server!",
-        url: "https://google.com"
-    },
-    token: "cfqlohBoXVFqEwBXhIXN-E:APA91bGN2speyt4vppJUhg6S0FFcyrL4wcpq7N_ZerdVnq_fAsQTb_vnXJ7wOKUgfjmnfEaBTaAQ9AAnuaO3NH54Bj9CpEIX8fLfxJPWsj42KXkzG0W0wymfpqVfOp6GrhW2tFNqn_FV"
-})
-
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello World!');
@@ -33,12 +24,13 @@ app.get('/', (req: Request, res: Response) => {
 
 app.get('/webhoookAPI008ax', async (req: Request, res: Response) => {
     res.send('API endpoint');
-    const response = await fapp.messaging().send({
+    const response = await fapp.messaging().sendMulticast({
         notification: {
-            title: "Hello from the server!",
-            body: "Hello from the server",
+            title: "Air Alarm",
+            body: "There has been a change",
         },
-        token: "cfqlohBoXVFqEwBXhIXN-E:APA91bGN2speyt4vppJUhg6S0FFcyrL4wcpq7N_ZerdVnq_fAsQTb_vnXJ7wOKUgfjmnfEaBTaAQ9AAnuaO3NH54Bj9CpEIX8fLfxJPWsj42KXkzG0W0wymfpqVfOp6GrhW2tFNqn_FV"
+        tokens: subscribers
+
     })
     console.log(response);
     
@@ -46,7 +38,10 @@ app.get('/webhoookAPI008ax', async (req: Request, res: Response) => {
 });
 app.post('/subscribe', (req: Request, res: Response) => {
     if(req.body.id) {
-        if(!subscribers.includes(req.body.id)) subscribers.push(req.body.id)
+        if(!subscribers.includes(req.body.id)) {
+            subscribers.push(req.body.id)
+            console.log("New subscriber: ", req.body.id);
+        }
     }
 })
 
