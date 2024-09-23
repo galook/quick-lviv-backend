@@ -1,6 +1,7 @@
 import { Express } from "express";
 import express, { Request, Response } from "express";
 import admin from "firebase-admin";
+import axios from "axios";
 
 const fapp = admin.initializeApp({   
     credential: admin.credential.cert({
@@ -13,10 +14,23 @@ const fapp = admin.initializeApp({
 // create an express app and a few endpoints 
 const app: Express = express();
 const port = 3548;
-const subscribers: string[] = [];
+const subscribers: string[] = ["edqRYbAd8BFhExmDMm_r3e:APA91bExj7BCWQOtfF2oCwz_NxLXXPf1DzBsXNSpyXODDonIvHjAQvXgItEJBISWllRjzrKKcWyF_W-1j6tHqOHuxMFTdroExVcQefogaHFVgKvU6zMTUtOsUd46imXltGEQmqTn_vfg"];
 // json parser 
 app.use(express.json());
 
+
+const getAlarms = async (): Promise<Date | null> => {
+    const response = await axios.get("https://api.ukrainealarm.com/api/v3/alerts/27", {
+        headers: {
+            "Authorization": "1b2b4efb:2522e7f82b261ceab97a25900c0e5b15"
+        }
+    });
+    const alerts =  response.data[0].activeAlerts;
+    if(alerts.length > 0) {
+        return alerts[0].lastUpdate;
+    }
+    return null;
+}
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello World!');
@@ -24,16 +38,29 @@ app.get('/', (req: Request, res: Response) => {
 
 app.get('/webhoookAPI008ax', async (req: Request, res: Response) => {
     res.send('API endpoint');
-    const response = await fapp.messaging().sendEachForMulticast({
-        notification: {
-            title: "Air Alarm",
-            body: "There has been a change",
-        },
-        tokens: subscribers
-    })
-    console.log(response);
-    console.log(response.responses[0]?.error)
-    
+    const alarms = await getAlarms();
+    if (alarms) {
+        const response = await fapp.messaging().sendEachForMulticast({
+            notification: {
+                title: "Air Alarm",
+                body: "An air alarm started or has been updated",
+            },
+            tokens: subscribers
+        })
+        console.log(response);
+        console.log(response.responses[0]?.error)
+    } else {
+        const response = await fapp.messaging().sendEachForMulticast({
+            notification: {
+                title: "Clear air",
+                body: "No air alarms are active around Lviv",
+            },
+            tokens: subscribers
+        })
+        console.log(response);
+
+    }
+    console.log("Sent notifications to: ", subscribers);
     
 });
 app.post('/subscribe', (req: Request, res: Response) => {
