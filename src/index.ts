@@ -24,13 +24,12 @@ app.get('/', (req: Request, res: Response) => {
 
 app.get('/webhoookAPI008ax', async (req: Request, res: Response) => {
     res.send('API endpoint');
-    const response = await fapp.messaging().sendMulticast({
+    const response = await fapp.messaging().sendEachForMulticast({
         notification: {
             title: "Air Alarm",
             body: "There has been a change",
         },
         tokens: subscribers
-
     })
     console.log(response);
     console.log(response.responses[0]?.error)
