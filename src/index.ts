@@ -33,6 +33,7 @@ app.get('/webhoookAPI008ax', async (req: Request, res: Response) => {
 
     })
     console.log(response);
+    console.log(response.responses[0]?.error)
     
     
 });
