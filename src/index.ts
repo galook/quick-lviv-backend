@@ -36,7 +36,7 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello World!');
 });
 
-app.get('/webhoookAPI008ax', async (req: Request, res: Response) => {
+app.get('/webhoookAPI008ac', async (req: Request, res: Response) => {
     res.send('API endpoint');
     const alarms = await getAlarms();
     if (alarms) {
